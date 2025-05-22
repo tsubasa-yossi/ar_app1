@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR Example2</title>
+    <!-- A-Frameを読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <!-- AR.js(A-Frame用)を読み込む -->
+      <!-- <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script> -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.min.js"></script>
+    <script defer src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <!-- シーンを作成 -->
+    <!-- <a-scene embedded arjs="sourceType: webcam;"> -->
+    <a-scene 
+        embedded arjs='sourceType: webcam;' >
+      <a-assets>
+        <!-- 3Dモデルを読み込む -->
+        <a-asset-items id="Wolf" src="/src/Wolf-Blender-2.82a.gltf"></a-asset-items>
+      </a-assets>
+      <!-- マーカー（今回はhiroマーカー）を検出して立方体を表示する -->
+      <!-- emitevents=true でマーカーの検出イベントを有効にする -->
+      <a-marker preset="hiro" emitevents="true">
+        <!-- 3Dモデルを呼び出す -->
+        <!-- gltfファイル（a-gltf-modelタグ）-->
+        <!-- <a-gltf-model scr="#Strawberry"></a-gltf-model> ←なぜか表示されない場合がある -->
+        <a-entity
+          position="0 0 0"
+          rotation="0 0 0"
+          scale="0.7 0.7 0.7"
+          gltf-model="#Wolf"
+        >
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+    <script>
+      document
+        .querySelector("a-marker")
+        .addEventListener("markerFound", (event) => {
+          console.log("Marker Found", event);
+        });
+
+      document
+        .querySelector("a-marker")
+        .addEventListener("markerLost", (event) => {
+          console.log("Marker Lost", event);
+        });
+    </script>
+  </body>
+</html>
+
