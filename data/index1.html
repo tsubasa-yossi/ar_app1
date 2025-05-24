@@ -1,52 +1,93 @@
 <!DOCTYPE html>
 <html>
   <head>
+  <style>
+    button {
+      display:block;
+      margin: 0 auto;
+      color: #000;
+      background-color: #fff100;
+      border-bottom: 5px solid #ccc100;
+    }
+  </style>
     <title>AR Example2</title>
-    <!-- A-Frameを読み込む -->
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-    <!-- AR.js(A-Frame用)を読み込む -->
-      <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <!-- <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.min.js"></script> -->
-    <script defer src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
-
-    <meta name="mobile-web-app-capable" content="yes" />
+  <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden">
+    <button id="attack_button">攻撃</button>
     <!-- シーンを作成 -->
     <!-- <a-scene embedded arjs="sourceType: webcam;"> -->
     <a-scene 
         embedded arjs='sourceType: webcam;' >
       <a-assets>
         <!-- 3Dモデルを読み込む -->
-        <a-asset-items id="Wolf" src="/src/Wolf-Blender-2.82a.gltf"></a-asset-items>
+        <a-asset-items id="Wolf" src="/gltf/Wolf-Blender-2.82a.gltf"></a-asset-items>
       </a-assets>
       <!-- マーカー（今回はhiroマーカー）を検出して立方体を表示する -->
+       <!-- マーカーは以下のサイトで作成する -->
+       <!-- https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html -->
       <!-- emitevents=true でマーカーの検出イベントを有効にする -->
-      <a-marker preset="hiro" emitevents="true">
-        <!-- 3Dモデルを呼び出す -->
-        <!-- gltfファイル（a-gltf-modelタグ）-->
-        <!-- <a-gltf-model scr="#Strawberry"></a-gltf-model> ←なぜか表示されない場合がある -->
-        <a-entity
+
+      <a-marker id="marker2" type="pattern" url="pattern-a.patt">
+          <a-entity id="wolf_entity2" 
+            position="0 0 0"
+            rotation="0 0 0"
+            scale="1 1 1"
+            gltf-model="#Wolf"
+          >
+      </a-marker>
+
+      <a-marker id="marker1" type="pattern" url="pattern-marker.patt">
+        <a-entity id="wolf_entity" 
           position="0 0 0"
           rotation="0 0 0"
-          scale="0.7 0.7 0.7"
+          scale="1 1 1"
           gltf-model="#Wolf"
         >
       </a-marker>
+
       <a-entity camera></a-entity>
     </a-scene>
     <script>
+      var target_url_base = "http://localhost:3000/";
+      var target_url = "";
       document
-        .querySelector("a-marker")
+        .querySelector("#marker1")
         .addEventListener("markerFound", (event) => {
-          console.log("Marker Found", event);
+          console.log("Marker Found1", event);
+          target_url = target_url_base + "marker1/";
+        });
+      document
+        .querySelector("#marker1")
+        .addEventListener("markerLost", (event) => {
+          console.log("Marker Lost1", event);
+          target_url = "";
         });
 
       document
-        .querySelector("a-marker")
-        .addEventListener("markerLost", (event) => {
-          console.log("Marker Lost", event);
+        .querySelector("#marker2")
+        .addEventListener("markerFound", (event) => {
+          console.log("Marker Found2", event);
+          target_url = target_url_base + "marker2/";
         });
+      document
+        .querySelector("#marker2")
+        .addEventListener("markerLost", (event) => {
+          console.log("Marker Lost2", event);
+          target_url = "";
+        });
+
+      document.getElementById("attack_button").addEventListener("click", function() {
+          console.log("ボタンがクリックされました！", event);
+          if (target_url !=""){
+            $.post( target_url, 'damege=1' ).done(function( data ) {
+                console.log( data );
+            })
+          }
+      });
+
     </script>
   </body>
 </html>
