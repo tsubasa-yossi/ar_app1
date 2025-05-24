@@ -2,12 +2,65 @@
 <html>
   <head>
   <style>
-    button {
+    #target_hp_area {
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      width: 100%;
+      height: 10%;
+      font-size: 200%;
+      text-align: center;
+      transform: translateX(-50%);
+      z-index: 1001;
+        font-style: italic;
+      letter-spacing: .1em;
+      color: #fff;
+      text-shadow: -4px 3px 0 #fa4141, -8px 6px 0 #000;
+    }
+    #button_area {
+      position: absolute;
+      top: 85%;
+      left: 50%;
+      width: 100%;
+      height: 10%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+    #attack_button {
       display:block;
       margin: 0 auto;
-      color: #000;
-      background-color: #fff100;
-      border-bottom: 5px solid #ccc100;
+      width: 40%;
+      height: 80%;
+      font-size: 150%;
+      -webkit-transform: skew(-15deg);
+      transform: skew(-15deg);
+      color: #fff;
+      border-radius: 0;
+      background-image: -webkit-gradient(linear, left top, right top, from(#2af598), to(#009efd));
+      background-image: -webkit-linear-gradient(left, #2af598 0%, #009efd 100%);
+      background-image: linear-gradient(90deg, #2af598 0%, #009efd 100%);
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+    }
+
+    #reset_button_area {
+      position: absolute;
+      top: 0%;
+      left: 5%;
+      width: 10%;
+      height: 5%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+    #reset_button {
+      display:block;
+      margin: 0 auto;
+      width: 100%;
+      height: 100%;
+      font-size: 100%;
+      color: #fff;
+      background-color: #eb6100;
+      border-radius: 10px;
     }
   </style>
     <title>AR Example2</title>
@@ -16,7 +69,15 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden">
-    <button id="attack_button">攻撃</button>
+    <div id="button_area">
+      <button id="attack_button">攻撃</button>
+    </div>
+    <div id="reset_button_area">
+      <button id="reset_button">リセット</button>
+    </div>
+    <div id="target_hp_area">
+      target not found
+    </div>
     <!-- シーンを作成 -->
     <!-- <a-scene embedded arjs="sourceType: webcam;"> -->
     <a-scene 
@@ -24,70 +85,115 @@
       <a-assets>
         <!-- 3Dモデルを読み込む -->
         <a-asset-items id="Wolf" src="/gltf/Wolf-Blender-2.82a.gltf"></a-asset-items>
+        <a-asset-items id="soccer" src="/gltf/soccer_ ball.gltf"></a-asset-items>
+      
       </a-assets>
       <!-- マーカー（今回はhiroマーカー）を検出して立方体を表示する -->
        <!-- マーカーは以下のサイトで作成する -->
        <!-- https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html -->
       <!-- emitevents=true でマーカーの検出イベントを有効にする -->
 
+      <a-marker id="marker1" type="pattern" url="pattern-marker.patt">
+        <a-entity id="soccer_entity" 
+          position="0 0 0"
+          rotation="-90 0 0"
+          scale="0.1 0.1 0.1"
+          gltf-model="#soccer"
+        >
+      </a-marker>
       <a-marker id="marker2" type="pattern" url="pattern-a.patt">
           <a-entity id="wolf_entity2" 
             position="0 0 0"
-            rotation="0 0 0"
+            rotation="-90 0 0"
             scale="1 1 1"
             gltf-model="#Wolf"
           >
       </a-marker>
 
-      <a-marker id="marker1" type="pattern" url="pattern-marker.patt">
-        <a-entity id="wolf_entity" 
-          position="0 0 0"
-          rotation="0 0 0"
-          scale="1 1 1"
-          gltf-model="#Wolf"
-        >
-      </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
     <script>
-      var target_url_base = "http://localhost:3000/";
+      var target_url_base = "http://localhost:3000/marker/";
+      var reset_url = "http://localhost:3000/reset/";
       var target_url = "";
+      var marker_no = 0;
+      var target_marker_str = "";
+      const target_lost_str = "target not found";
+      const let_attark_str = "Let's attack!";
       document
         .querySelector("#marker1")
         .addEventListener("markerFound", (event) => {
           console.log("Marker Found1", event);
-          target_url = target_url_base + "marker1/";
+          target_url = target_url_base;
+          marker_no = 1;
+          $("#target_hp_area").text(let_attark_str);
         });
       document
         .querySelector("#marker1")
         .addEventListener("markerLost", (event) => {
           console.log("Marker Lost1", event);
           target_url = "";
+          marker_no = 0;
+          $("#target_hp_area").text(target_lost_str);
         });
 
       document
         .querySelector("#marker2")
         .addEventListener("markerFound", (event) => {
           console.log("Marker Found2", event);
-          target_url = target_url_base + "marker2/";
+          target_url = target_url_base;
+          marker_no = 2;
+          $("#target_hp_area").text(let_attark_str);
         });
       document
         .querySelector("#marker2")
         .addEventListener("markerLost", (event) => {
           console.log("Marker Lost2", event);
           target_url = "";
+          marker_no = 0;
+          $("#target_hp_area").text(target_lost_str);
         });
 
       document.getElementById("attack_button").addEventListener("click", function() {
           console.log("ボタンがクリックされました！", event);
           if (target_url !=""){
-            $.post( target_url, 'damege=1' ).done(function( data ) {
-                console.log( data );
-            })
+            // $.post( target_url, 'damege=1' ).done(function( data ) {
+            //     console.log( data );
+            // })
+              $.ajax({
+                  async: false,
+                  url: target_url,
+                  type: 'post',
+                  data:{"marker_no": marker_no},
+                  dataType: 'json'
+                  }).done(function(res){
+                    console.log(res);
+                    target_marker_str = "marker" + marker_no;
+                    $("#target_hp_area").text("トータルダメージ: " + res[target_marker_str]);
+
+                    
+                  }).fail(function(xhr, status, error){
+                    alert(status);
+                });
+
           }
       });
 
+      document.getElementById("reset_button").addEventListener("click", function() {
+          console.log("リセットボタンがクリックされました！", event);
+          $.ajax({
+              async: false,
+              url: reset_url,
+              type: 'post',
+              data:{},
+              dataType: 'json'
+              }).done(function(res){
+                console.log(res);           
+              }).fail(function(xhr, status, error){
+                alert(status);
+            });
+      });
     </script>
   </body>
 </html>
