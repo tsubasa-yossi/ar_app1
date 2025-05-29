@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="stylesheet" href="style.css" type="text/css">
+  
+    <title>AR Example2</title>
+  <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <div id="img_area">
+    </div>
+    <div id="img_point">
+    </div>
+    <div id="button_area">
+      <button id="attack_button">攻撃</button>
+    </div>
+    <div id="reset_button_area">
+      <button id="reset_button">リセット</button>
+    </div>
+    <div id="target_hp_area">
+      target not found
+    </div>
+    <!-- シーンを作成 -->
+    <!-- <a-scene embedded arjs="sourceType: webcam;"> -->
+    <a-scene 
+        embedded arjs='sourceType: webcam;' >
+      <a-assets>
+        <!-- 3Dモデルを読み込む -->
+        <!-- <a-asset-items id="Wolf" src="/gltf/Wolf-Blender-2.82a.gltf"></a-asset-items>
+        <a-asset-items id="soccer" src="/gltf/soccer_ ball.gltf"></a-asset-items> -->
+      
+      </a-assets>
+      <!-- マーカー（今回はhiroマーカー）を検出して立方体を表示する -->
+       <!-- マーカーは以下のサイトで作成する -->
+       <!-- https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html -->
+      <!-- emitevents=true でマーカーの検出イベントを有効にする -->
+
+      <a-marker id="marker1" type="pattern" url="pattern-marker.patt">
+        <a-entity id="soccer_entity" 
+          position="0 0 0"
+          rotation="-90 0 0"
+          scale="0.1 0.1 0.1"
+          gltf-model="#soccer"
+        >
+      </a-marker>
+      <a-marker id="marker2" type="pattern" url="pattern-a.patt">
+          <a-entity id="wolf_entity2" 
+            position="0 0 0"
+            rotation="-90 0 0"
+            scale="1 1 1"
+            gltf-model="#Wolf"
+          >
+      </a-marker>
+
+
+      <a-entity camera></a-entity>
+    </a-scene>
+    <script>
+      // var target_url_base = "http://localhost:3000/marker/";
+      // var reset_url = "http://localhost:3000/reset/";
+      var target_url_base = "https://ar-app1.onrender.com/marker/";
+      var reset_url = "https://ar-app1.onrender.com/reset/";
+      var target_url = "";
+      var marker_no = 0;
+      var target_marker_str = "";
+      var socket = io();
+      var point_top = 0;
+      var point_left = 0;
+      var point_img_str = ""
+      const target_lost_str = "target not found";
+      const let_attark_str = "Let's attack!";
+      document
+        .querySelector("#marker1")
+        .addEventListener("markerFound", (event) => {
+          console.log("Marker Found1", event);
+          target_url = target_url_base;
+          marker_no = 1;
+          $("#img_area").html('<img src="image/Japan.jpeg" class="anime">');
+          $("#target_hp_area").text(let_attark_str);
+        });
+      document
+        .querySelector("#marker1")
+        .addEventListener("markerLost", (event) => {
+          console.log("Marker Lost1", event);
+          target_url = "";
+          marker_no = 0;
+          $("#img_area").html('');
+          $("#target_hp_area").text(target_lost_str);
+        });
+
+      document
+        .querySelector("#marker2")
+        .addEventListener("markerFound", (event) => {
+          console.log("Marker Found2", event);
+          target_url = target_url_base;
+          marker_no = 2;
+          $("#img_area").html('<img src="image/British.jpeg" class="anime">');
+          $("#target_hp_area").text(let_attark_str);
+        });
+      document
+        .querySelector("#marker2")
+        .addEventListener("markerLost", (event) => {
+          console.log("Marker Lost2", event);
+          target_url = "";
+          marker_no = 0;
+          $("#img_area").html('');
+          $("#target_hp_area").text(target_lost_str);
+        });
+
+      document.getElementById("attack_button").addEventListener("click", function() {
+          console.log("ボタンがクリックされました！", event);
+          point_top = Math.floor( Math.random() * 40 ) + 20
+          point_left = Math.floor( Math.random() * 50 ) + 20
+          point_img_str = '<img src="image/teian.png" class="anime_teian" style="top: ' + point_top + '%; left: ' + point_left + '%;">';
+          console.log("point image : ", point_img_str);
+          $("#img_point").html(point_img_str);
+          if (target_url !=""){
+              socket.emit('attack', marker_no);
+          }
+      });
+
+			socket.on('attack', function(res){
+				console.log(res);
+        target_marker_str = "marker" + marker_no;
+        $("#target_hp_area").text("トータルダメージ: " + res[target_marker_str]);
+			});
+      
+      document.getElementById("reset_button").addEventListener("click", function() {
+          console.log("リセットボタンがクリックされました！", event);
+          socket.emit('reset');
+      });
+    </script>
+  </body>
+</html>
+
