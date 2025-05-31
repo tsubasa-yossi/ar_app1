@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="stylesheet" href="style.css" type="text/css">
+  
+  <title>AR GAME</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <div id="team_area"  class="div_text"> マスタ画面
+    </div>
+
+    <div id="reset_button_area">
+      <button id="reset_button">リセット</button>
+    </div>
+    <div id="target_hp_area" class="div_text">
+      target not found
+    </div>
+    
+    <script>
+
+        var socket = io();
+        document.getElementById("reset_button").addEventListener("click", function() {
+            console.log("リセットボタンがクリックされました！", event);
+            socket.emit('reset');
+        });
+    </script>
+  </body>
+</html>
+

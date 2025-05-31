@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="stylesheet" href="style.css" type="text/css">
+  
+  <title>AR GAME</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    
+    <div id="target_hp_list_area">     </div>
+
+    <script>
+        var socket = io();
+        var list_str = "";
+        var team = 0;
+
+        $(document).ready(function(){
+            socket.emit('load', {});
+        });
+        // サーバーからの応答を取得する
+        socket.on('attack', function(res){
+            console.log(res);
+            list_str = "オブザーバー画面<br><br>";
+            for (  var i = 0;  i < 5;  i++  ) {
+                team = res['marker_state'][i];
+                if (team == 0){
+                    list_str = list_str + "マーカー > " + String(i + 1) 
+                    + "  チーム1ポイント:" + String(res['marker_cnt'][1][i]) 
+                    + "  チーム2ポイント:" + String(res['marker_cnt'][2][i]) + "<br><br>";
+                } else {
+                    list_str = list_str + "マーカー" + String(i + 1) + "の所属:" + team + "、ポイント:" + String(res['marker_cnt'][team][i]) + "<br><br>";
+                }
+            }
+
+            $("#target_hp_list_area").html(list_str);
+        });
+
+    </script>
+
+
+
+</body>
+</html>
+

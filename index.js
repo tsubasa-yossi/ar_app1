@@ -16,14 +16,22 @@ app.use(cors({
     allowedHeaders:["Access-Control-Allow-Origin:*"]
 }))
 
+
+// ゲームイメージ
+// 初期では中立の状態
+// どちらかのチームが得点を100点獲得したら、所属がそのチームに以降する
+// 所属後も奪還することは可能であるが、攻撃側は2点+、防御側は-1点
+// 見事に攻撃側が100点になれば、奪還可能
+
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-let cnt1 = 0;
-let cnt2 = 0;
-let cnt3 = 0;
-let cnt4 = 0;
-let cnt5 = 0;
-let target_no = 0;
+let marker_cnt = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]; // marker_cnt[team][marker_no]
+let marker_state = [0,0,0,0,0]; // 0: neutral, 1: team1, 2: team2
+let marker_no = 0;
+let team = 0; // 初期はteam1
+let state = 0;
+let check_state = 0;
 
 
 app.get('/', (req, res) => {
@@ -35,48 +43,53 @@ app.get('/', (req, res) => {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('attack', function(msg){
-    console.log('get attack message: ' + msg);
-    target_no = msg;
-    if (target_no == 1) {
-        cnt1++;
-        cnt1=check_hp(cnt1);
-    } else if (target_no == 2) {
-        cnt2++;
-        cnt2=check_hp(cnt2);
-    } else if (target_no == 3) {
-        cnt3++;
-        cnt3=check_hp(cnt3);
-    } else if (target_no == 4) {
-        cnt4++;
-        cnt4=check_hp(cnt4);
-    } else if (target_no == 5) {
-        cnt5++;
-        cnt5=check_hp(cnt5);
+    console.log('get attack message: team:' + msg['team'] + ' marker_no:' + msg['marker_no']);
+    marker_no = msg['marker_no'];
+    team = msg['team'];
+    state = marker_state[marker_no-1];
+    // 所属状態に応じて、ポイントを加算する
+    if ( state == 0) {
+      marker_cnt[team][marker_no-1]++;
+      check_state = team;
+    } else {
+      check_state = state;
+      if (team != state) {
+        marker_cnt[state][marker_no-1] += 2; // 攻撃側は2点
+      } else {
+        marker_cnt[state][marker_no-1] -= 1; // 防御側は-1点
+      }
+    } 
+    // ポイントを確認して所属を更新
+    if (marker_cnt[check_state][marker_no-1] > 10) {
+      marker_cnt[check_state][marker_no-1] = 0;
+      marker_state[marker_no-1] = team; // 所属変更
+      console.log('change marker_state: ' + marker_state[marker_no-1]);
+    } else if (marker_cnt[check_state][marker_no-1] < 0) {
+      marker_cnt[check_state][marker_no-1] = 0;
     }
-    io.emit('attack', {
-      "marker1":cnt1, "marker2":cnt2, "marker3":cnt3, "marker4":cnt4, "marker5":cnt5
-    });
+
+    io.emit('attack', {"marker_state":marker_state,"marker_cnt":marker_cnt});
   });
+
+
   socket.on('reset', function(msg){
     console.log('reset message');
-    cnt1 = 0;
-    cnt2 = 0;
-    cnt3 = 0;
-    cnt4 = 0;
-    cnt5 = 0;
-    io.emit('attack', {
-      "marker1":cnt1, "marker2":cnt2, "marker3":cnt3, "marker4":cnt4, "marker5":cnt5
-    });
+    marker_cnt = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]; // marker_cnt[team][marker_no]
+    marker_state = [0,0,0,0,0]; // 0: neutral, 1: team1, 2: team2
+    marker_no = 0;
+    team = 0; // 初期はteam1
+    state = 0;
+    check_state = 0;
+    io.emit('attack', {"marker_state":marker_state,"marker_cnt":marker_cnt});
   });
+
+  socket.on('load', function(msg){
+    io.emit('attack', {"marker_state":marker_state,"marker_cnt":marker_cnt});
+  });
+
 });
 
-var check_hp = function(cnt) {
-  if (cnt > 30) {
-    return 0;
-  } else {
-    return cnt;
-  }
-}
+
 
 
 http.listen(port, () => console.log('Example app listening on port ' + port + '!'));
