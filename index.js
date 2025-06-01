@@ -32,6 +32,7 @@ let marker_no = 0;
 let team = 0; // 初期はteam1
 let state = 0;
 let check_state = 0;
+let max_point = 100;
 
 
 app.get('/', (req, res) => {
@@ -60,7 +61,7 @@ io.on('connection', function(socket){
       }
     } 
     // ポイントを確認して所属を更新
-    if (marker_cnt[check_state][marker_no-1] > 10) {
+    if (marker_cnt[check_state][marker_no-1] > max_point) {
       marker_cnt[check_state][marker_no-1] = 0;
       marker_state[marker_no-1] = team; // 所属変更
       console.log('change marker_state: ' + marker_state[marker_no-1]);

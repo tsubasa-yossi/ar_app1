@@ -13,33 +13,50 @@ document
 .addEventListener("markerFound", (event) => {
     console.log("Marker Found1", event);
     marker_no = 1;
-    $("#img_area").html('<img src="image/Japan.jpeg" class="anime">');
-    $("#target_hp_area").text(let_attark_str);
-});
-document
-.querySelector("#marker1")
-.addEventListener("markerLost", (event) => {
-    console.log("Marker Lost1", event);
-    marker_no = 0;
-    $("#img_area").html('');
-    $("#target_hp_area").text(target_lost_str);
-});
-
-document
-.querySelector("#marker2")
-.addEventListener("markerFound", (event) => {
-    console.log("Marker Found2", event);
-    marker_no = 2;
     $("#img_area").html('<img src="image/British.jpeg" class="anime">');
     $("#target_hp_area").text(let_attark_str);
 });
 document
 .querySelector("#marker2")
-.addEventListener("markerLost", (event) => {
-    console.log("Marker Lost2", event);
-    marker_no = 0;
-    $("#img_area").html('');
-    $("#target_hp_area").text(target_lost_str);
+.addEventListener("markerFound", (event) => {
+    console.log("Marker Found2", event);
+    marker_no = 2;
+    $("#img_area").html('<img src="image/Japan.jpeg" class="anime">');
+    $("#target_hp_area").text(let_attark_str);
+});
+document
+.querySelector("#marker3")
+.addEventListener("markerFound", (event) => {
+    console.log("Marker Found3", event);
+    marker_no = 2;
+    $("#img_area").html('<img src="image/President.jpeg" class="anime">');
+    $("#target_hp_area").text(let_attark_str);
+});
+document
+.querySelector("#marker4")
+.addEventListener("markerFound", (event) => {
+    console.log("Marker Found4", event);
+    marker_no = 2;
+    $("#img_area").html('<img src="image/Roman.jpeg" class="anime">');
+    $("#target_hp_area").text(let_attark_str);
+});
+document
+.querySelector("#marker5")
+.addEventListener("markerFound", (event) => {
+    console.log("Marker Found5", event);
+    marker_no = 2;
+    $("#img_area").html('<img src="image/egypt.png" class="anime">');
+    $("#target_hp_area").text(let_attark_str);
+});
+
+const markers = document.querySelectorAll(".marker");
+markers.forEach(function(marker){
+    marker.addEventListener("markerLost", (event) => {
+        console.log("Marker Lost", event);
+        marker_no = 0;
+        $("#img_area").html('');
+        $("#target_hp_area").text(target_lost_str);
+    });
 });
 
 document.getElementById("attack_button").addEventListener("click", function() {
