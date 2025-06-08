@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ディフェンダー画面</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <h2>ディフェンダー画面</h2>
+  <p>この画面ではARコードを守ることができます。</p>
+  <p>ブロックするARコードIDなどは今後の仕様に応じて実装します。</p>
+
+  <script>
+    const socket = io();
+    const team = new URLSearchParams(window.location.search).get('team') || 'A';
+    socket.emit('joinTeam', { team, role: 'defender' });
+    // ブロック機能はサーバーとの調整で後日実装予定
+  </script>
+</body>
+</html>

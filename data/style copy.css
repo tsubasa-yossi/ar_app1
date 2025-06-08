@@ -1,0 +1,160 @@
+@charset "utf-8";
+
+.anime {
+    position: absolute;
+    top: 15%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    object-fit: cover;
+    z-index: 1;
+    animation: anime 1s ease-in-out forwards;
+}
+@keyframes anime {
+    0%  {
+    transform: scale(1.0, 1.0) translate(0, 0);
+    }
+    15% {
+    transform: scale(0.98, 0.9) translate(0, 5px);
+    }
+    30% {
+    transform: scale(1.02, 1.0) translate(0, 8px);
+    }
+    50% {transform: scale(0.98, 1.05) translate(0, -8px);
+    }
+    70% {
+    transform: scale(1.0, 0.9) translate(0, 5px);
+    }
+    100% {
+    transform: scale(1.0, 1.0) translate(0, 0);
+    }
+    0%, 100% {
+    opacity: 1;
+    }
+}
+
+.anime_teian {
+    position: absolute;
+    /* top: 15%;
+    left: 25%; */
+    width: 10%;
+    height: 10%;
+    object-fit: cover;
+    z-index: 2;
+    animation: anime_teian 0.6s ease-in-out forwards ;
+}
+@keyframes anime_teian {
+    0%  {
+    transform: scale(1.0, 1.0) translate(0, 0);
+    }
+    15% {
+    transform: scale(0.98, 0.9) translate(0, 5px);
+    }
+    30% {
+    transform: scale(1.02, 1.0) translate(0, 8px);
+    }
+    50% {transform: scale(0.98, 1.05) translate(0, -8px);
+    }
+    70% {
+    transform: scale(1.0, 0.9) translate(0, 5px);
+    }
+    100% {
+    transform: scale(1.0, 1.0) translate(0, 0);
+    }
+    0% , 100%{
+    opacity: 0;
+    }
+    50% {
+    opacity: 1;
+    }
+}
+
+
+
+
+.div_text {
+    position: absolute;
+    font-size: 200%;
+    text-align: center;
+    transform: translateX(-50%);
+    z-index: 1001;
+    font-style: italic;
+    letter-spacing: .1em;
+    color: #fff;
+    text-shadow: -4px 3px 0 #fa4141, -8px 6px 0 #000;
+}
+
+#target_hp_list_area {
+    font-size: 100%;
+    left: 0%;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    z-index: 1001;
+    font-style: italic;
+    letter-spacing: .1em;
+    color: #000000;
+}
+
+
+#team_area {
+    top: 5%;
+    left: 50%;
+    width: 60%;
+    height: 10%;
+}
+
+#target_hp_area {
+    top: 75%;
+    left: 50%;
+    width: 100%;
+    height: 10%;
+}
+
+#button_area {
+    touch-action: manipulation;
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    width: 100%;
+    height: 10%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+#attack_button {
+    touch-action: manipulation;
+    display:block;
+    margin: 0 auto;
+    width: 80%;
+    height: 100%;
+    font-size: 150%;
+    -webkit-transform: skew(-15deg);
+    transform: skew(-15deg);
+    color: #fff;
+    border-radius: 0;
+    background-image: -webkit-gradient(linear, left top, right top, from(#2af598), to(#009efd));
+    background-image: -webkit-linear-gradient(left, #2af598 0%, #009efd 100%);
+    background-image: linear-gradient(90deg, #2af598 0%, #009efd 100%);
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+}
+
+#reset_button_area {
+    position: absolute;
+    top: 0%;
+    left: 15%;
+    width: 30%;
+    height: 5%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+#reset_button {
+    display:block;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    font-size: 100%;
+    color: #fff;
+    background-color: #eb6100;
+    border-radius: 10px;
+}

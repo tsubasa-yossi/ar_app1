@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ハッカー画面</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <h2>ハッカー画面</h2>
+  <p id="freeze-message" style="color:red;"></p>
+  <input id="question-id" placeholder="問題ID">
+  <input id="answer" placeholder="回答">
+  <button id="submit-answer">送信</button>
+  <p id="answer-result"></p>
+
+  <script>
+    const socket = io();
+    const team = new URLSearchParams(window.location.search).get('team') || 'A';
+
+    socket.emit('joinTeam', { role: 'hacker' });
+
+    $('#submit-answer').on('click', () => {
+      const codeId = $('#question-id').val();
+      const answer = $('#answer').val();
+      socket.emit('submitAnswer', { team, codeId, answer });
+    });
+
+    socket.on('answerResult', ({ correct }) => {
+      $('#answer-result').text(correct ? '正解！' : '不正解...');
+    });
+
+    socket.on('freeze', ({ duration }) => {
+      $('#freeze-message').text(`フリーズ中: ${duration / 1000}秒`);
+      $('#submit-answer').prop('disabled', true);
+      setTimeout(() => {
+        $('#freeze-message').text('');
+        $('#submit-answer').prop('disabled', false);
+      }, duration);
+    });
+
+
+  </script>
+</body>
+</html>

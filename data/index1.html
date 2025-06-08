@@ -1,91 +1,123 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
   <link rel="stylesheet" href="style.css" type="text/css">
-  
-  <title>AR GAME</title>
-  <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <title>ARバトルゲーム</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
-  
-  </head>
-  <body style="margin: 0; overflow: hidden">
-    <div id="team_area"  class="div_text"> チーム1
-    </div>
-    <div id="img_area">
-    </div>
-    <div id="img_point">
-    </div>
-    <div id="button_area">
-      <button id="attack_button">攻撃</button>
-    </div>
-    <div id="reset_button_area">
-      <button id="reset_button">リセット</button>
-    </div>
-    <div id="target_hp_area" class="div_text">
-      target not found
-    </div>
-    <!-- シーンを作成 -->
-    <!-- <a-scene embedded arjs="sourceType: webcam;"> -->
-    <a-scene 
-        embedded arjs='sourceType: webcam;' >
-      <a-assets>
-        <!-- 3Dモデルを読み込む -->
-   
-      </a-assets>
-      <!-- マーカー（今回はhiroマーカー）を検出して立方体を表示する -->
-       <!-- マーカーは以下のサイトで作成する -->
-       <!-- https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html -->
-      <!-- emitevents=true でマーカーの検出イベントを有効にする -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+</head>
+<body>
+  <div id="select-screen">
+    <h2>チーム選択</h2>
+    <select id="team-select">
+      <option value="A">チームA</option>
+      <option value="B">チームB</option>
+    </select>
+    <h2>ロール選択</h2>
+    <select id="role-select">
+      <option value="hacker">ハッカー</option>
+      <option value="runner">ランナー</option>
+      <option value="defender">ディフェンダー</option>
+    </select><br><br>
+    <button id="join-btn">参加</button>
+  </div>
 
-      <a-marker id="marker1" class="marker" type="pattern" url="marker/pattern-marker1.patt">
-        <a-entity id="marker1_entity" 
-          position="0 0 0"
-          rotation="-90 0 0"
-          scale="0.1 0.1 0.1"
-          gltf-model="#soccer"
-        >
-      </a-marker>
-      <a-marker id="marker2" class="marker" type="pattern" url="marker/pattern-marker2.patt">
-          <a-entity id="marker2_entity" 
-            position="0 0 0"
-            rotation="-90 0 0"
-            scale="1 1 1"
-            gltf-model="#Wolf"
-          >
-      </a-marker>
-      <a-marker id="marker3" class="marker" type="pattern" url="marker/pattern-marker3.patt">
-          <a-entity id="marker3_entity" 
-            position="0 0 0"
-            rotation="-90 0 0"
-            scale="1 1 1"
-            gltf-model="#Wolf"
-          >
-      </a-marker>
-      <a-marker id="marker4" class="marker" type="pattern" url="marker/pattern-marker4.patt">
-          <a-entity id="marker4_entity" 
-            position="0 0 0"
-            rotation="-90 0 0"
-            scale="1 1 1"
-            gltf-model="#Wolf"
-          >
-      </a-marker>
-      <a-marker id="marker5" class="marker" type="pattern" url="marker/pattern-marker5.patt">
-          <a-entity id="marker5_entity" 
-            position="0 0 0"
-            rotation="-90 0 0"
-            scale="1 1 1"
-            gltf-model="#Wolf"
-          >
-      </a-marker>
+  <div id="hacker-screen" class="hidden">
+    <h2>ハッカー画面</h2>
+    <p id="freeze-message" style="color:red;"></p>
+    <input id="question-id" placeholder="問題ID">
+    <input id="answer" placeholder="回答">
+    <button id="submit-answer">送信</button>
+    <p id="answer-result"></p>
+  </div>
 
-      <a-entity camera></a-entity>
-    </a-scene>
-    <script>  
-      var team = 1;
-    </script>
-    <script src="main.js"></script>
-  </body>
+  <div id="runner-screen" class="hidden">
+    <h2>ランナー画面</h2>
+    <p>ARコードをスキャンしてください</p>
+    <div id="ar-scene">
+        <!-- AR.jsのシーン -->
+      <a-scene embedded arjs vr-mode-ui="enabled: false">
+        <a-marker-camera></a-marker-camera>
+      </a-scene>
+    </div>
+    <button id="tap-button">ボタンをタップ（10回）</button>
+    <p id="tap-count">0 / 10</p>
+    <div id="question-area" class="hidden">
+      <p id="question-text"></p>
+      <button id="claim-point">ポイント取得</button>
+    </div>
+  </div>
+
+  <div id="defender-screen" class="hidden">
+    <h2>ディフェンダー画面</h2>
+    <p>防御中（ARコードを保護しています）</p>
+  </div>
+
+  <script>
+    const socket = io();
+    let currentQuestionId = null;
+    let tapCount = 0;
+
+    $('#join-btn').on('click', () => {
+      const team = $('#team-select').val();
+      const role = $('#role-select').val();
+      socket.emit('joinTeam', { team, role });
+    });
+
+    socket.on('roleConfirmed', ({ role }) => {
+      $('#select-screen').hide();
+      $(`#${role}-screen`).show();
+    });
+
+    $('#submit-answer').on('click', () => {
+      let codeId = $('#question-id').val();
+      let answer = $('#answer').val();
+      console.log('送信される回答:', codeId, answer);
+      socket.emit('submitAnswer', { codeId, answer });
+    });
+
+    socket.on('answerResult', ({ correct }) => {
+      $('#answer-result').text(correct ? '正解！' : '不正解...');
+    });
+
+    socket.on('freeze', ({ duration }) => {
+      $('#freeze-message').text(`フリーズ中: ${duration / 1000}秒`);
+      $('#submit-answer').prop('disabled', true);
+      setTimeout(() => {
+        $('#freeze-message').text('');
+        $('#submit-answer').prop('disabled', false);
+      }, duration);
+    });
+
+    $('#tap-button').on('click', () => {
+      tapCount++;
+      $('#tap-count').text(`${tapCount} / 10`);
+      if (tapCount >= 10) {
+        socket.emit('scanAR', { codeId: '1' }); // 実際はマーカーIDから取得
+        // 問題の場合は、q_1, q_2, ... などの形式で送信
+      }
+    });
+
+    socket.on('question', ({ questionId, text }) => {
+      console.log('問題が受信されました:', questionId, text);
+      currentQuestionId = questionId;
+      $('#question-area').show();
+      $('#question-text').text(text);
+    });
+
+    $('#claim-point').on('click', () => {
+      console.log('ポイント取得ボタンがクリックされました' + currentQuestionId);
+      if (currentQuestionId) {
+        socket.emit('claimPoint', { questionId: currentQuestionId });
+      }
+    });
+
+    socket.on('pointClaimed', ({ success, point }) => {
+      alert(success ?  String(point) + 'ポイント取得成功！' : '取得失敗：未解答か他チーム');
+    });
+  </script>
+</body>
 </html>
-

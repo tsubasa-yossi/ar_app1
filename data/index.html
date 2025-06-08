@@ -1,71 +1,38 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Marker Based AR with AR.js and Three.js</title>
-    <style>
-      .button {
-        position: absolute;
-        text-align: center;
-        width: 50%;
-        height: 15%;
-        border: 8px double #0090bb;
-      }
-      a{
-        display:block;
-        position: relative;
-        margin: 0 auto;
-        width: 100%;
-        height: 100%;
-        top: 50%;
-        line-height: 15%;
-        font-size: 200%;
-        color: #000;
-        text-decoration: none;
-      }
-      #a1 {
-        top: 5%;
-        left: 25%;
-      }
-      #a2 {
-        top: 25%;
-        left: 25%;
-      }
-      #a3 {
-        top: 45%;
-        left: 25%;
-      }
-      #a4 {
-        top: 65%;
-        left: 25%;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="button" id="a1">
-      <a href="http://localhost:3000/master.html">管理者</a>
-    </div>
-    <div class="button" id="a2">
-      <a href="http://localhost:3000/index1.html">チーム１</a>
-    </div>
-    <div class="button" id="a3">
-      <a href="http://localhost:3000/index2.html">チーム２</a>
-    </div>
-    <div class="button" id="a4">
-      <a href="http://localhost:3000/index_viewer.html">オブザーバー</a>
-    </div>
-    
-    <!-- <div class="button" id="a1">
-      <a href="http://ar-app1.onrender.com/">管理者</a>
-    </div>
-    <div class="button" id="a2">
-      <a href="http://ar-app1.onrender.com/index1.html">チーム１</a>
-    </div>
-    <div class="button" id="a3">
-      <a href="http://ar-app1.onrender.com/index2.html">チーム２</a>
-    </div>
-    <div class="button" id="a4">
-      <a href="http://ar-app1.onrender.com/">オブザーバー</a>
-    </div> -->
+<head>
+  <meta charset="UTF-8">
+  <title>チームとロール選択</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <h2>ゲーム参加</h2>
+  <label>チーム選択:</label>
+  <select id="team-select">
+    <option value="A">チームA</option>
+    <option value="B">チームB</option>
+  </select>
+  <br>
+  <label>ロール選択:</label>
+  <select id="role-select">
+    <option value="hacker">ハッカー</option>
+    <option value="runner">ランナー</option>
+    <option value="defender">ディフェンダー</option>
+  </select>
+  <br>
+  <button id="start-btn">参加</button>
 
-  </body>
+  <script>
+    const socket = io();
+    $('#start-btn').on('click', function () {
+      const team = $('#team-select').val();
+      const role = $('#role-select').val();
+      window.location.href = `${role}.html?team=${team}`;
+      // socket.emit('joinTeam', { team, role });
+    });
+
+
+  </script>
+</body>
 </html>

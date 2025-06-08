@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ARバトルゲーム</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 20px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="select-screen">
+    <h2>チーム選択</h2>
+    <select id="team-select">
+      <option value="A">チームA</option>
+      <option value="B">チームB</option>
+    </select>
+    <h2>ロール選択</h2>
+    <select id="role-select">
+      <option value="hacker">ハッカー</option>
+      <option value="runner">ランナー</option>
+      <option value="defender">ディフェンダー</option>
+    </select><br><br>
+    <button id="join-btn">参加</button>
+  </div>
+
+  <div id="hacker-screen" class="hidden">
+    <h2>ハッカー画面</h2>
+    <p id="freeze-message" style="color:red;"></p>
+    <input id="question-id" placeholder="問題ID">
+    <input id="answer" placeholder="回答">
+    <button id="submit-answer">送信</button>
+    <p id="answer-result"></p>
+  </div>
+
+  <div id="runner-screen" class="hidden">
+    <h2>ランナー画面</h2>
+    <p>ARコードをスキャンしてください</p>
+    <a-scene embedded arjs>
+      <a-marker-camera preset="hiro"></a-marker-camera>
+    </a-scene>
+    <button id="tap-button">ボタンをタップ（10回）</button>
+    <p id="tap-count">0 / 10</p>
+    <div id="question-area" class="hidden">
+      <p id="question-text"></p>
+      <button id="claim-point">ポイント取得</button>
+    </div>
+  </div>
+
+  <div id="defender-screen" class="hidden">
+    <h2>ディフェンダー画面</h2>
+    <p>防御中（ARコードを保護しています）</p>
+  </div>
+
+  <script>
+    const socket = io();
+    let currentQuestionId = null;
+    let tapCount = 0;
+
+    $('#join-btn').on('click', () => {
+      const team = $('#team-select').val();
+      const role = $('#role-select').val();
+      socket.emit('joinTeam', { team, role });
+    });
+
+    socket.on('roleConfirmed', ({ role }) => {
+      $('#select-screen').hide();
+      $(`#${role}-screen`).show();
+    });
+
+    $('#submit-answer').on('click', () => {
+      const questionId = $('#question-id').val();
+      const answer = $('#answer').val();
+      socket.emit('submitAnswer', { questionId, answer });
+    });
+
+    socket.on('answerResult', ({ correct }) => {
+      $('#answer-result').text(correct ? '正解！' : '不正解...');
+    });
+
+    socket.on('freeze', ({ duration }) => {
+      $('#freeze-message').text(`フリーズ中: ${duration / 1000}秒`);
+      $('#submit-answer').prop('disabled', true);
+      setTimeout(() => {
+        $('#freeze-message').text('');
+        $('#submit-answer').prop('disabled', false);
+      }, duration);
+    });
+
+    $('#tap-button').on('click', () => {
+      tapCount++;
+      $('#tap-count').text(`${tapCount} / 10`);
+      if (tapCount >= 10) {
+        socket.emit('scanAR', { codeId: 'testCode' }); // 実際はマーカーIDから取得
+        // 問題の場合は、q_1, q_2, ... などの形式で送信
+      }
+    });
+
+    socket.on('question', ({ questionId, text }) => {
+      currentQuestionId = questionId;
+      $('#question-area').show();
+      $('#question-text').text(text);
+    });
+
+    $('#claim-point').on('click', () => {
+      if (currentQuestionId) {
+        socket.emit('claimPoint', { questionId: currentQuestionId });
+      }
+    });
+
+    socket.on('pointClaimed', ({ success }) => {
+      alert(success ? 'ポイント取得成功！' : '取得失敗：未解答か他チーム');
+    });
+  </script>
+</body>
+</html>

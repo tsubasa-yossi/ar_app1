@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>管理者画面（Master）</title>
+  <title>得点ビューア</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <style>
@@ -18,18 +18,10 @@
     th {
       background-color: #ddd;
     }
-    #controls {
-      margin-bottom: 10px;
-    }
   </style>
 </head>
 <body>
-  <h2>管理者画面（Master）</h2>
-
-  <div id="controls">
-    <button id="reset-button">ゲーム状態をリセット</button>
-  </div>
-
+  <h2>得点状況一覧</h2>
   <table id="score-table">
     <thead>
       <tr>
@@ -37,10 +29,10 @@
         <th>内容</th>
         <th>回答チーム</th>
         <th>正解</th>
-        <th>得点</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+    </tbody>
   </table>
 
   <script>
@@ -56,24 +48,19 @@
           <td>${qinfo.team || '-'}</td>
           <td>${qinfo.answered ? '○' : '×'}</td>
           <td>${qinfo.pointget}</td>
+          
         </tr>`;
         tbody.append(row);
       }
     }
 
-    // 定期更新
+    // 定期的に状態取得
     setInterval(() => {
       socket.emit('requestScore');
     }, 3000);
 
     socket.on('scoreData', (questions) => {
       updateScoreboard(questions);
-    });
-
-    $('#reset-button').on('click', function () {
-      if (confirm('本当に全データをリセットしますか？')) {
-        socket.emit('resetGame');
-      }
     });
   </script>
 </body>
