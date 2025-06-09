@@ -1,19 +1,91 @@
 @charset "utf-8";
 
-body { font-family: sans-serif; text-align: center; margin: 20px; }
+body { 
+    /* font-family: sans-serif;  */
+    text-align: center; 
+    margin: 0;
+    overflow: hidden;
+}
 
 .hidden { display: none; }
 
-#ar-scene { display: none; }
+div {
+    
+    text-align: center;
+    z-index: 1001;
+
+}
 
 button {
     display:block;
+    touch-action: manipulation;
     margin: 0 auto;
-    width: 80%;
-    height: 10%;
-    font-size: 100%;
+    /* width: 80%;
+    height: 10%; */
+    font-size: 150%;
     color: #fff;
     background-color: #eb6100;
     border-radius: 10px;
+    z-index: 1001;
+}
+
+.div_text {
+    position: absolute;
+    font-size: 200%;
+    text-align: center;
+    transform: translateX(-50%);
+    z-index: 1001;
+}
+
+#title {
+    top: 5%;
+    left: 50%;
+    width: 60%;
+    height: 10%;
+    font-size: 150%;
+    font-weight: bold;
+    z-index: 1001;
+}
+
+#tap-count {
+    top: 10%;
+    left: 50%;
+    width: 60%;
+    height: 10%;
+    font-size: 150%;
+    z-index: 1001;
+}
+
+#tap-button-area {
+    touch-action: manipulation;
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    width: 100%;
+    height: 10%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+#tap-button {
+    margin: 0 auto;
+    width: 80%;
+    height: 100%;
+    z-index: 1000;
+}
+
+#question-area {
+    touch-action: manipulation;
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    width: 100%;
+    height: 5%;
+    transform: translateX(-50%);
+    z-index: 1001;
+}
+#claim-point {
+    margin: 0 auto;
+    width: 60%;
+    height: 100%;
     z-index: 1001;
 }

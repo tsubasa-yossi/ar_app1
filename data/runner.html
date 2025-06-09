@@ -8,37 +8,46 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
 </head>
 <body>
-  <h2>ランナー画面</h2>
-
-  <button id="tap-button">ボタンをタップ（10回）</button>
-  <p id="tap-count">0 / 10</p>
+  <div id="title" class="div_text">ランナー画面</div>
+  <div id="tap-button-area" style="display:none">   
+    <button id="tap-button">ボタンをタップ（10回）</button>
+  </div>
+  <div id="tap-count"  class="div_text">0 / 10</div>
   <div id="question-area" style="display:none">
-    <p id="question-text"></p>
+    <!-- <p id="question-text"></p> -->
     <button id="claim-point">ポイント取得</button>
   </div>
 
   <a-scene embedded arjs='sourceType: webcam;' vr-mode-ui="enabled: false">
     <a-assets>
         <!-- 3Dモデルを読み込む -->
+        <a-asset-items id="q_1" src="gltf/q_1.glb"></a-asset-items>
     </a-assets>
     <a-marker id="marker1" class="marker" type="pattern" url="marker/pattern-marker1.patt">
-        <a-entity id="marker1_entity" 
+        <!-- <a-entity id="marker1_entity" 
             position="0 0 0"
-            rotation="-90 0 0"
-            scale="0.1 0.1 0.1"
-            gltf-model="#soccer"
-        >
+            rotation="20 30 40"
+            scale="0.3 0.3 0.3"
+            gltf-model="#q_1"
+        > -->
     </a-marker>
     <a-entity camera></a-entity>
   </a-scene>
+
 
   <script>
     const socket = io();
     const team = new URLSearchParams(window.location.search).get('team') || 'A';
     let tapCount = 0;
     let currentQuestionId = null;
+    let qrId = 0;
+    let q_html = {
+      1:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_1">'
+      // 他の問題のHTMLもここに追加できます
+    };
 
     socket.emit('joinTeam', { team, role: 'runner' });
 
@@ -46,7 +55,8 @@
       tapCount++;
       $('#tap-count').text(`${tapCount} / 10`);
       if (tapCount >= 10) {
-        socket.emit('scanAR', { codeId: '1' });
+        $("#marker"+qrId).html(q_html[qrId]);
+        socket.emit('scanAR', { codeId: String(qrId) });
       }
     });
 
@@ -66,6 +76,13 @@
       alert(success ? 'ポイント取得成功！' : '取得失敗：未解答か他チーム');
     });
 
+  document
+  .querySelector("#marker1")
+  .addEventListener("markerFound", (event) => {
+      console.log("Marker Found1", event);
+      $("#tap-button-area").show();
+      qrId = 1;
+  });
 
   </script>
 </body>
