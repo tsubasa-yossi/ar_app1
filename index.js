@@ -48,16 +48,18 @@ let gameState = initializeGameState();
 
 io.on('connection', (socket) => {
   console.log('ユーザー接続:', socket.id);
-
+  
   socket.on('joinTeam', ({ team, role }) => {
     socket.team = team;
     socket.role = role;
+
+    console.log(gameState.teams);
+    console.log(`ユーザー ${socket.id} がチーム ${team} の役割 ${role} で参加しました。`);
 
     if (role === 'hacker') gameState.teams[team].hacker = socket.id;
     if (role === 'defender') gameState.teams[team].defender = socket.id;
     if (role === 'runner') gameState.teams[team].runners.push(socket.id);
 
-    console.log(`ユーザー ${socket.id} がチーム ${team} の役割 ${role} で参加しました。`);
     socket.emit('roleConfirmed', { role });
 
   });

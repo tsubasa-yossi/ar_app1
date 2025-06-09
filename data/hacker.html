@@ -5,12 +5,69 @@
   <title>ハッカー画面</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #e3f2fd; /* 青系の背景 */
+        color: #0d47a1;
+    }
+    h2 {
+        margin-top: 20px;
+    }
+    #freeze-message {
+        color: red;
+        font-weight: bold;
+    }
+    select, input, button {
+        display: block;
+        width: 80%;
+        max-width: 300px;
+        margin: 10px auto;
+        padding: 10px;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 2px solid #0d47a1;
+    }
+    select {
+        background-color: #bbdefb;
+    }
+    input {
+        background-color: #ffffff;
+    }
+    button {
+        background-color: #0d47a1;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #1565c0;
+    }
+</style>
+
 </head>
 <body>
   <h2>ハッカー画面</h2>
   <p id="freeze-message" style="color:red;"></p>
-  <input id="question-id" placeholder="問題ID">
+  <!-- <input id="question-id" placeholder="問題ID"> -->
+   <label for="question-id">問題ID:</label>
+    <select id="question-id">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+    </select>
+
+</br>
   <input id="answer" placeholder="回答">
+</br>
   <button id="submit-answer">送信</button>
   <p id="answer-result"></p>
 
@@ -18,7 +75,7 @@
     const socket = io();
     const team = new URLSearchParams(window.location.search).get('team') || 'A';
 
-    socket.emit('joinTeam', { role: 'hacker' });
+    socket.emit('joinTeam', {team:team,  role: 'hacker' });
 
     $('#submit-answer').on('click', () => {
       const codeId = $('#question-id').val();
