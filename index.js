@@ -35,8 +35,10 @@ function initializeGameState() {
       B: { hacker: null, runners: [], defender: null }
     },
     questions: {
-    q_1 :{ text: "問題1の内容", answer: "正解", answered: false, team: null, point: 1 ,pointget: 0},
-    q_2 :{ text: "問題2の内容", answer: "正解2", answered: false, team: null, point: 3 ,pointget: 0},
+    q_1 :{ text: "問題1", answer: "豊洲", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_2 :{ text: "問題2", answer: "AWS", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    
+    q_3 :{ text: "問題3", answer: "54", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
 
      // { questionId: { text, answered, team, correct } }
   }
@@ -64,7 +66,7 @@ io.on('connection', (socket) => {
 
   });
 
-  socket.on('submitAnswer', ({ codeId, answer }) => {
+  socket.on('submitAnswer', ({ team, codeId, answer }) => {
     console.log(`回答提出: ${String(codeId)} by ${socket.id}, 回答: ${answer}`);
     let questionId = "q_" + String(codeId);
     let question = gameState.questions[questionId];
@@ -82,6 +84,22 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('block_codeid', ({ team, codeId}) => {
+    console.log(`コードブロック: ${codeId} by ${socket.id}`);
+    let questionId = "q_" + String(codeId);
+    let question = gameState.questions[questionId];
+    // ブロック処理
+    question.blocked = 5;
+    const timer = setInterval(() => {
+      if (question.blocked > 0) {
+        question.blocked -= 1;
+      } else {
+        clearInterval(timer);
+      }
+    }, 1000);
+  });
+
+
   socket.on('scanAR', ({ codeId }) => {
     // 仮のARコード処理（ハズレ or 問題を出す）
     if (codeId.startsWith('bad')) {
@@ -98,7 +116,7 @@ io.on('connection', (socket) => {
   socket.on('claimPoint', ({ questionId }) => {
     const question = gameState.questions[questionId];
     console.log(`ポイント請求: ${questionId} by ${socket.id}`);
-    if (question && question.answered && question.team === socket.team) {
+    if (question && question.answered && question.team === socket.team && question.blocked === 0) {
       question.pointget = question.point;
       socket.emit('pointClaimed', { success: true , point: question.point });
     } else {

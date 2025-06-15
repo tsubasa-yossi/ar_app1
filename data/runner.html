@@ -25,14 +25,13 @@
     <a-assets>
         <!-- 3Dモデルを読み込む -->
         <a-asset-items id="q_1" src="gltf/q_1.glb"></a-asset-items>
+        <a-asset-items id="q_1" src="gltf/q_2.glb"></a-asset-items>
+        <a-asset-items id="q_1" src="gltf/q_3.glb"></a-asset-items>
     </a-assets>
     <a-marker id="marker1" class="marker" type="pattern" url="marker/pattern-marker1.patt">
-        <!-- <a-entity id="marker1_entity" 
-            position="0 0 0"
-            rotation="20 30 40"
-            scale="0.3 0.3 0.3"
-            gltf-model="#q_1"
-        > -->
+    <a-marker id="marker2" class="marker" type="pattern" url="marker/pattern-marker2.patt">
+    <a-marker id="marker3" class="marker" type="pattern" url="marker/pattern-marker3.patt">
+
     </a-marker>
     <a-entity camera></a-entity>
   </a-scene>
@@ -63,7 +62,7 @@
     socket.on('question', ({ questionId, text }) => {
       currentQuestionId = questionId;
       $('#question-area').show();
-      $('#question-text').text(text);
+      // $('#question-text').text(text);
     });
 
     $('#claim-point').on('click', () => {
@@ -76,13 +75,20 @@
       alert(success ? 'ポイント取得成功！' : '取得失敗：未解答か他チーム');
     });
 
-  document
-  .querySelector("#marker1")
-  .addEventListener("markerFound", (event) => {
-      console.log("Marker Found1", event);
-      $("#tap-button-area").show();
+  document.querySelector("#marker1").addEventListener("markerFound", (event) => {
+      console.log("Marker Found1", event);    $("#tap-button-area").show();
       qrId = 1;
   });
+  document.querySelector("#marker2").addEventListener("markerFound", (event) => {
+      console.log("Marker Found2", event);    $("#tap-button-area").show();
+      qrId = 2;
+  });
+  document.querySelector("#marker3").addEventListener("markerFound", (event) => {
+      console.log("Marker Found3", event);    $("#tap-button-area").show();
+      qrId = 3;
+  });
+
+
 
   </script>
 </body>

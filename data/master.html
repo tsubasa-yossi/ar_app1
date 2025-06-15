@@ -38,6 +38,7 @@
         <th>回答チーム</th>
         <th>正解</th>
         <th>得点</th>
+        <th>ブロック</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -56,6 +57,7 @@
           <td>${qinfo.team || '-'}</td>
           <td>${qinfo.answered ? '○' : '×'}</td>
           <td>${qinfo.pointget}</td>
+          <td>${qinfo.blocked}</td>
         </tr>`;
         tbody.append(row);
       }

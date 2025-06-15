@@ -5,17 +5,90 @@
   <title>ディフェンダー画面</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+    #solution {
+      margin-bottom: 10px;
+    }
+
+    #solution img {
+      width: 200px;
+      height: 200px;
+      border: 2px solid #666;
+      object-fit: cover;
+    }
+
+    #board {
+      width: 450px;
+      height: 450px;
+      display: flex;
+      flex-wrap: wrap;
+      position: relative;
+      border: 2px solid #333;
+    }
+    .tile {
+      width: 150px;
+      height: 150px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      background-size: 450px 450px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+    .empty {
+      background: none;
+      border: none;
+      cursor: default;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h2>ディフェンダー画面</h2>
-  <p>この画面ではARコードを守ることができます。</p>
-  <p>ブロックするARコードIDなどは今後の仕様に応じて実装します。</p>
+  <h2>ハッカー画面</h2>
+  <p id="freeze-message" style="color:red;"></p>
+  <!-- <input id="question-id" placeholder="問題ID"> -->
+   <label for="question-id">問題ID:</label>
+    <select id="question-id">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+    </select>
+
+</br>
+  <button id="block" style="display:none">ブロック</button>
+
+
+  <!-- ✅ 正解の画像 -->
+  <div id="solution">
+    <p>完成図：</p>
+    <img src="image/puzzle1.jpg" alt="完成図">
+  </div>
+
+  <div id="board"></div>
+
+
+  <script src="puzzle.js"></script>
 
   <script>
     const socket = io();
     const team = new URLSearchParams(window.location.search).get('team') || 'A';
     socket.emit('joinTeam', { team, role: 'defender' });
     // ブロック機能はサーバーとの調整で後日実装予定
+
+    $('#block').on('click', () => {
+      const codeId = $('#question-id').val();
+      socket.emit('block_codeid', { team, codeId});
+      $('#block').hide();
+    });
   </script>
 </body>
 </html>
