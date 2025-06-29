@@ -35,11 +35,21 @@ function initializeGameState() {
       B: { hacker: null, runners: [], defender: null }
     },
     questions: {
-    q_1 :{ text: "問題1", answer: "豊洲", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
-    q_2 :{ text: "問題2", answer: "AWS", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_1 :{ text: "", answer: "豊洲", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_2 :{ text: "", answer: "AWS", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_3 :{ text: "", answer: "調和", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_4 :{ text: "", answer: "金融", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_5 :{ text: "", answer: "室", answered: false, team: null, point: 1 ,pointget: 0, blocked: 0},
+    q_6 :{ text: "", answer: "1988", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_7 :{ text: "", answer: "LITRON", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_8 :{ text: "", answer: "54", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_9 :{ text: "", answer: "13", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_10 :{ text: "", answer: "情熱", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_11 :{ text: "", answer: "6", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
+    q_12 :{ text: "", answer: "565", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0},
+    q_13 :{ text: "", answer: "人間関係", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0},
+    q_14 :{ text: "", answer: "文部科学省", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0}
     
-    q_3 :{ text: "問題3", answer: "54", answered: false, team: null, point: 3 ,pointget: 0, blocked: 0},
-
      // { questionId: { text, answered, team, correct } }
   }
   };
@@ -141,3 +151,8 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`サーバー起動 http://localhost:${PORT}`);
 });
+
+
+
+
+
