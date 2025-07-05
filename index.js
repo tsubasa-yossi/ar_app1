@@ -87,8 +87,10 @@ io.on('connection', (socket) => {
     if (answer === question.answer) {
       question.answered = true;
       question.team = socket.team;
+      console.log(`正解: ${questionId} by ${socket.id}`);
       io.to(socket.id).emit('answerResult', { correct: true });
     } else {
+      console.log(`不正解: ${answer} <> ${question.answer}`);
       io.to(socket.id).emit('answerResult', { correct: false });
       io.to(socket.id).emit('freeze', { duration: 10000 });
     }
@@ -111,21 +113,23 @@ io.on('connection', (socket) => {
 
 
   socket.on('scanAR', ({ codeId }) => {
-    // 仮のARコード処理（ハズレ or 問題を出す）
-    if (codeId.startsWith('bad')) {
+    // const questionId = "q_" + codeId;
+    // ハズレの場合、通知して、
+    if (codeId = 15 ){
+      console.log("ハズレのQRコードがスキャンされました: ", codeId);
+      // socket.emit('question', { questionId:questionId, text: gameState.questions[questionId].text });
       let hackerId = gameState.teams[socket.team].hacker;
-      io.to(hackerId).emit('freeze', { duration: 10000 });
-      return;
+      io.to(hackerId).emit('freeze', { duration: 20000 });
+      socket.emit('question', { text: "ハズレですww" });
     }
-
-    // 問題を割り当てる
-    const questionId = "q_" + codeId;
-    socket.emit('question', { questionId:questionId, text: gameState.questions[questionId].text });
   });
 
-  socket.on('claimPoint', ({ questionId }) => {
-    const question = gameState.questions[questionId];
+  socket.on('claimPoint', ({ codeId }) => {
+    let questionId = "q_" + String(codeId);
+    let question = gameState.questions[questionId];
     console.log(`ポイント請求: ${questionId} by ${socket.id}`);
+    // console.log(question);
+    console.log(`請求チーム: ${socket.team},回答チーム: ${question.team}, 回答済み: ${question.answered}, ブロック状態: ${question.blocked}`);
     if (question && question.answered && question.team === socket.team && question.blocked === 0) {
       question.pointget = question.point;
       socket.emit('pointClaimed', { success: true , point: question.point });

@@ -40,23 +40,24 @@
         <a-asset-items id="q_14" src="gltf/問題１４.glb"></a-asset-items>
     
     </a-assets>
-    <a-marker id="marker1" class="marker" type="pattern" url="marker/pattern-01.patt"></a-marker>
-    <a-marker id="marker2" class="marker" type="pattern" url="marker/pattern-02.patt"></a-marker>
-    <a-marker id="marker3" class="marker" type="pattern" url="marker/pattern-03.patt"></a-marker>
-    <a-marker id="marker4" class="marker" type="pattern" url="marker/pattern-04.patt"></a-marker>
-    <a-marker id="marker5" class="marker" type="pattern" url="marker/pattern-05.patt"></a-marker>
-    <a-marker id="marker6" class="marker" type="pattern" url="marker/pattern-06.patt"></a-marker>
-    <a-marker id="marker7" class="marker" type="pattern" url="marker/pattern-07.patt"></a-marker>
-    <a-marker id="marker8" class="marker" type="pattern" url="marker/pattern-08.patt"></a-marker>
-    <a-marker id="marker9" class="marker" type="pattern" url="marker/pattern-09.patt"></a-marker>
-    <a-marker id="marker10" class="marker" type="pattern" url="marker/pattern-10.patt"></a-marker>
-    <a-marker id="marker11" class="marker" type="pattern" url="marker/pattern-11.patt"></a-marker>
-    <a-marker id="marker12" class="marker" type="pattern" url="marker/pattern-12.patt"></a-marker>
-    <a-marker id="marker13" class="marker" type="pattern" url="marker/pattern-13.patt"></a-marker>
-    <a-marker id="marker14" class="marker" type="pattern" url="marker/pattern-14.patt"></a-marker>
+    <a-marker id="marker1" class="marker" type="pattern" url="marker/pattern-01.patt">
+    <a-marker id="marker2" class="marker" type="pattern" url="marker/pattern-02.patt">
+    <a-marker id="marker3" class="marker" type="pattern" url="marker/pattern-03.patt">
+    <a-marker id="marker4" class="marker" type="pattern" url="marker/pattern-04.patt">
+    <a-marker id="marker5" class="marker" type="pattern" url="marker/pattern-05.patt">
+    <a-marker id="marker6" class="marker" type="pattern" url="marker/pattern-06.patt">
+    <a-marker id="marker7" class="marker" type="pattern" url="marker/pattern-07.patt">
+    <a-marker id="marker8" class="marker" type="pattern" url="marker/pattern-08.patt">
+    <a-marker id="marker9" class="marker" type="pattern" url="marker/pattern-09.patt">
+    <a-marker id="marker10" class="marker" type="pattern" url="marker/pattern-10.patt">
+    <a-marker id="marker11" class="marker" type="pattern" url="marker/pattern-11.patt">
+    <a-marker id="marker12" class="marker" type="pattern" url="marker/pattern-12.patt">
+    <a-marker id="marker13" class="marker" type="pattern" url="marker/pattern-13.patt">
+    <a-marker id="marker14" class="marker" type="pattern" url="marker/pattern-14.patt">
       <!-- ハズレようのタグ -->
-    <a-marker id="marker15" class="marker" type="pattern" url="marker/pattern-15.patt"></a-marker>
+    <a-marker id="marker15" class="marker" type="pattern" url="marker/pattern-15.patt">
 
+    </a-marker>
     <a-entity camera></a-entity>
   </a-scene>
 
@@ -66,6 +67,7 @@
     const team = new URLSearchParams(window.location.search).get('team') || 'A';
     let tapCount = new Array(15).fill(0);
     let currentQuestionId = null;
+    let qrId = 0;
     let q_html = {
       1:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_1">',
       2:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_2">',
@@ -85,23 +87,6 @@
         // 他の問題のHTMLもここに追加できます
     };
 
-    const markerCount = 15;
-    let currentMarker = null;
-    let qrId = null;
-    // マーカーIDと対応させたオブジェクトを作る
-    const markers = {};
-    for (let i = 1; i <= markerCount; i++) {
-      const markerEl = document.querySelector(`#marker${i}`);
-      if (!markerEl) continue;
-      markers[`marker${i}`] = {
-        el: markerEl,
-        id: i,
-      };
-      markerEl.addEventListener("markerFound", () => onMarkerFound(`marker${i}`));
-      markerEl.addEventListener("markerLost", () => onMarkerLost(`marker${i}`));
-    }
-
-
     // ゲームに参加する
     socket.emit('joinTeam', { team, role: 'runner' });
 
@@ -109,15 +94,13 @@
     $('#tap-button').on('click', () => {
       tapCount[qrId-1]++;
       $('#tap-count').text(`${tapCount[qrId-1]} / 10`);
-      if (tapCount[qrId-1] == 10) {
+      if (tapCount[qrId-1] >= 10) {
         //１０回タップしたら問題を表示する
         if (qrId == 15 ){
           console.log("ハズレのQRコードがスキャンされました: ", qrId);
-          tapCount[qrId-1] = 0;
           socket.emit('scanAR', { codeId: String(qrId) });
         } else {
           console.log("QRコードがスキャンされました: ", qrId);
-          console.log(q_html[qrId]);
           $("#marker"+qrId).html(q_html[qrId]);
         }
         
@@ -125,13 +108,13 @@
     });
 
     socket.on('question', ({ text }) => {
+      $('#question-area').show();
       $('#question-text').text(text);
     });
 
     $('#claim-point').on('click', () => {
-      if (qrId) {
-        console.log(`ポイント取得要求: ${qrId}`);
-        socket.emit('claimPoint', { codeId: qrId });
+      if (currentQuestionId) {
+        socket.emit('claimPoint', { questionId: currentQuestionId });
       }
     });
 
@@ -142,31 +125,66 @@
 
   // マーカーが見つかったときのイベントリスナー
   // タップボタンの表示と、問題番号を記録する。
-  function onMarkerFound(markerName) {
-    const marker = markers[markerName];
-    if (!marker) return;
-    if (currentMarker) return; // 他のマーカーが処理中
-    if (!marker.el.object3D.visible) return; // 見えていないなら無視
-
-    currentMarker = markerName;
-    qrId = marker.id;
-    $('#tap-count').text(`${tapCount[qrId-1]} / 10`);
-    console.log(`Marker Found: ${qrId}`);
-    $('#question-area').show();
-    $("#tap-button-area").show();
-  }
-
-  function onMarkerLost(markerName) {
-    if (currentMarker === markerName) {
-      currentMarker = null;
-      qrId = null;
-      $('#question-text').text(null);
-      $('#tap-count').text(`0 / 10`);
-      $('#question-area').hide();
-      $("#tap-button-area").hide();
-      console.log(`Marker Lost: ${qrId}`);
-    }
-  }
+  document.querySelector("#marker1").addEventListener("markerFound", (event) => {
+      console.log("Marker Found1", event);    $("#tap-button-area").show();
+      qrId = 1;
+  });
+  document.querySelector("#marker2").addEventListener("markerFound", (event) => {
+      console.log("Marker Found2", event);    $("#tap-button-area").show();
+      qrId = 2;
+  });
+  document.querySelector("#marker3").addEventListener("markerFound", (event) => {
+      console.log("Marker Found3", event);    $("#tap-button-area").show();
+      qrId = 3;
+  });
+  document.querySelector("#marker4").addEventListener("markerFound", (event) => {
+      console.log("Marker Found4", event);    $("#tap-button-area").show();
+      qrId = 4;
+  });
+  document.querySelector("#marker5").addEventListener("markerFound", (event) => {
+      console.log("Marker Found5", event);    $("#tap-button-area").show();
+      qrId = 5;
+  });
+  document.querySelector("#marker6").addEventListener("markerFound", (event) => {
+      console.log("Marker Found6", event);    $("#tap-button-area").show();
+      qrId = 6;
+  });
+  document.querySelector("#marker7").addEventListener("markerFound", (event) => {
+      console.log("Marker Found7", event);    $("#tap-button-area").show();
+      qrId = 7;
+  });
+  document.querySelector("#marker8").addEventListener("markerFound", (event) => {
+      console.log("Marker Found8", event);    $("#tap-button-area").show();
+      qrId = 8;
+  });
+  document.querySelector("#marker9").addEventListener("markerFound", (event) => {
+      console.log("Marker Found9", event);    $("#tap-button-area").show();
+      qrId = 9;
+  });
+  document.querySelector("#marker10").addEventListener("markerFound", (event) => {
+      console.log("Marker Found10", event);    $("#tap-button-area").show();
+      qrId = 10;
+  });
+  document.querySelector("#marker11").addEventListener("markerFound", (event) => {
+      console.log("Marker Found11", event);    $("#tap-button-area").show();
+      qrId = 11;
+  });
+  document.querySelector("#marker12").addEventListener("markerFound", (event) => {
+      console.log("Marker Found12", event);    $("#tap-button-area").show();
+      qrId = 12;
+  });
+  document.querySelector("#marker13").addEventListener("markerFound", (event) => {
+      console.log("Marker Found13", event);    $("#tap-button-area").show();
+      qrId = 13;
+  });
+  document.querySelector("#marker14").addEventListener("markerFound", (event) => {
+      console.log("Marker Found14", event);    $("#tap-button-area").show();
+      qrId = 14;
+  });
+  document.querySelector("#marker15").addEventListener("markerFound", (event) => {
+      console.log("Marker Found15", event);    $("#tap-button-area").show();
+      qrId = 15;
+  });
 
 
   </script>

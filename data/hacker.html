@@ -88,15 +88,28 @@
     });
 
     socket.on('freeze', ({ duration }) => {
-      $('#freeze-message').text(`フリーズ中: ${duration / 1000}秒`);
+      const seconds = Math.floor(duration / 1000);
+      let remaining = seconds;
+
+      // 最初の表示
+      $('#freeze-message').text(`フリーズ中: ${remaining}秒`);
       $('#submit-answer').prop('disabled', true);
-      setTimeout(() => {
-        $('#freeze-message').text('');
-        $('#submit-answer').prop('disabled', false);
-      }, duration);
+      $('#submit-answer').hide();
+
+      // カウントダウン用のintervalを開始
+      const intervalId = setInterval(() => {
+        remaining--;
+
+        if (remaining > 0) {
+          $('#freeze-message').text(`フリーズ中: ${remaining}秒`);
+        } else {
+          clearInterval(intervalId);
+          $('#freeze-message').text('');
+          $('#submit-answer').prop('disabled', false);
+          $('#submit-answer').show();
+        }
+      }, 1000);
     });
-
-
   </script>
 </body>
 </html>
