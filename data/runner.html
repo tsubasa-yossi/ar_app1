@@ -68,19 +68,19 @@
     let currentQuestionId = null;
     let q_html = {
       1:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_1">',
-      2:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_2">',
-      3:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_3">',
-      4:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_4">',
-      5:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_5">',
-      6:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_6">',
-      7:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_7">',
-      8:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_8">',
-      9:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_9">',
+      2:'<a-entity position="0 0 0" rotation="50 0 0" scale="0.3 0.3 0.3" gltf-model="#q_2">',
+      3:'<a-entity position="0 0 0" rotation="0 30 0" scale="0.3 0.3 0.3" gltf-model="#q_3">',
+      4:'<a-entity position="0 0 0" rotation="0 0 60" scale="0.3 0.3 0.3" gltf-model="#q_4">',
+      5:'<a-entity position="0 0 0" rotation="50 70 30" scale="0.3 0.3 0.3" gltf-model="#q_5">',
+      6:'<a-entity position="0 0 0" rotation="10 180 70" scale="0.3 0.3 0.3" gltf-model="#q_6">',
+      7:'<a-entity position="0 0 0" rotation="-50 30 30" scale="0.3 0.3 0.3" gltf-model="#q_7">',
+      8:'<a-entity position="0 0 0" rotation="-20 -30 -40" scale="0.3 0.3 0.3" gltf-model="#q_8">',
+      9:'<a-entity position="0 0 0" rotation="10 -90 -50" scale="0.3 0.3 0.3" gltf-model="#q_9">',
       10:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_10">',
-      11:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_11">',
-      12:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_12">',
-      13:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_13">',
-      14:'<a-entity position="0 0 0" rotation="20 30 40" scale="0.3 0.3 0.3" gltf-model="#q_14">',
+      11:'<a-entity position="0 0 0" rotation="50 30 50" scale="0.3 0.3 0.3" gltf-model="#q_11">',
+      12:'<a-entity position="0 0 0" rotation="10 180 70" scale="0.3 0.3 0.3" gltf-model="#q_12">',
+      13:'<a-entity position="0 0 0" rotation="50 -180 50" scale="0.3 0.3 0.3" gltf-model="#q_13">',
+      14:'<a-entity position="0 0 0" rotation="10 180 70" scale="0.3 0.3 0.3" gltf-model="#q_14">',
             
         // 他の問題のHTMLもここに追加できます
     };
@@ -136,7 +136,7 @@
     });
 
     socket.on('pointClaimed', ({ success }) => {
-      alert(success ? 'ポイント取得成功！' : '取得失敗：未解答か他チーム');
+      alert(success ? 'ポイント取得成功！' : '取得失敗：未解答か他チームがブロック');
     });
 
 
