@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
     let questionId = "q_" + String(codeId);
     let question = gameState.questions[questionId];
     // ブロック処理
-    question.blocked = 30;
+    question.blocked = 60;
     const timer = setInterval(() => {
       if (question.blocked > 0) {
         question.blocked -= 1;
