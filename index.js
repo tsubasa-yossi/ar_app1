@@ -1,9 +1,19 @@
-// ======= index.js (Express + Socket.IO Server) =======
+// ======= index.js (Express + Socket.IO Server) - HTTPS Version =======
 const express = require('express');
-const http = require('http');
+const https = require('https'); // 'http' から 'https' に変更
+const fs = require('fs'); // 証明書ファイルを読み込むために 'fs' を追加
+const path = require('path'); // 'path' モジュールを追加
 const socketIo = require('socket.io');
+
+// 自己署名証明書の読み込み
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
 const app = express();
-const server = http.createServer(app);
+// httpsサーバーを作成
+const server = https.createServer(options, app); // http.createServer から変更
 const io = socketIo(server);
 
 const PORT = 3000;
@@ -49,9 +59,9 @@ function initializeGameState() {
     q_12 :{ text: "", answer: "565", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0},
     q_13 :{ text: "", answer: "人間関係", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0},
     q_14 :{ text: "", answer: "文部科学省", answered: false, team: null, point: 5 ,pointget: 0, blocked: 0}
-    
-     // { questionId: { text, answered, team, correct } }
-  }
+
+      // { questionId: { text, answered, team, correct } }
+    }
   };
 }
 
@@ -60,7 +70,7 @@ let gameState = initializeGameState();
 
 io.on('connection', (socket) => {
   console.log('ユーザー接続:', socket.id);
-  
+
   socket.on('joinTeam', ({ team, role }) => {
     socket.team = team;
     socket.role = role;
@@ -153,10 +163,6 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`サーバー起動 http://localhost:${PORT}`);
+  // ログメッセージを https に変更
+  console.log(`サーバー起動 https://localhost:${PORT}`);
 });
-
-
-
-
-
