@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>チームとロール選択</title>
@@ -8,48 +9,59 @@
 
   <style>
     body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: #e3f2fd; /* 青系の背景 */
-        color: #0d47a1;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #e3f2fd;
+      /* 青系の背景 */
+      color: #0d47a1;
     }
+
     h2 {
-        margin-top: 20px;
+      margin-top: 20px;
     }
+
     #freeze-message {
-        color: red;
-        font-weight: bold;
+      color: red;
+      font-weight: bold;
     }
-    select, input, button {
-        display: block;
-        width: 80%;
-        max-width: 300px;
-        margin: 10px auto;
-        padding: 10px;
-        font-size: 18px;
-        border-radius: 8px;
-        border: 2px solid #0d47a1;
-    }
-    select {
-        background-color: #bbdefb;
-    }
-    input {
-        background-color: #ffffff;
-    }
+
+    select,
+    input,
     button {
-        background-color: #0d47a1;
-        color: white;
-        cursor: pointer;
+      display: block;
+      width: 80%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 2px solid #0d47a1;
     }
+
+    select {
+      background-color: #bbdefb;
+    }
+
+    input {
+      background-color: #ffffff;
+    }
+
+    button {
+      background-color: #0d47a1;
+      color: white;
+      cursor: pointer;
+    }
+
     button:hover {
-        background-color: #1565c0;
+      background-color: #1565c0;
     }
+
     #game-rules {
       text-align: left;
     }
-
-</style>
+  </style>
 </head>
+
 <body>
   <h2>ゲーム参加</h2>
   <label>チーム選択:</label>
@@ -104,7 +116,20 @@
   </div>
 
   <script>
-    const socket = io();
+    // SSL接続のためのSocket.IOの設定
+    const hostname = window.location.hostname;
+    let socketUrl;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // ローカルのサーバーに接続
+      socketUrl = 'https://localhost:3000';
+    } else {
+      socketUrl = 'https://54.65.149.178:3000';
+    }
+    const socket = io(socketUrl);
+    console.log('接続先:', socketUrl);
+
+    // const socket = io();
+
     $('#start-btn').on('click', function () {
       const team = $('#team-select').val();
       const role = $('#role-select').val();
@@ -112,7 +137,7 @@
         // 管理者は特別なページにリダイレクト
         window.location.href = 'master.html';
         return;
-      }else if (role === 'viewer') {
+      } else if (role === 'viewer') {
         // オブザーバーは特別なページにリダイレクト
         window.location.href = 'viewer.html';
         return;
@@ -125,4 +150,5 @@
 
   </script>
 </body>
+
 </html>
